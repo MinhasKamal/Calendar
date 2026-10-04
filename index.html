@@ -5,6 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Full Screen Calendar</title>
 <style>
+    /* CSS Variables for Theming */
+    :root {
+        --bg-body: #121212;
+        --bg-title: #1f1f1f;
+        --text-title: #ffffff;
+        --text-main: #e0e0e0;
+        --border-color: #333;
+        --bg-header: #2c2c2c;
+        --bg-cell: #1e1e1e;
+        --bg-cell-hover: #2c2c2c;
+        --bg-empty: #121212;
+        --bg-today: #3e2723;
+        --border-today: #ff9800;
+        --bg-weekend: #2a1b1b;
+        --text-weekend: #ffbba6;
+        --menu-bg: #2d2d2d;
+        --menu-border: #444;
+    }
+
+    body.light-theme {
+        --bg-body: #ccc;
+        --bg-title: #2c3e50;
+        --text-title: #ffffff;
+        --text-main: #222222;
+        --border-color: #ccc;
+        --bg-header: #34495e;
+        --bg-cell: #ffffff;
+        --bg-cell-hover: #f1f8ff;
+        --bg-empty: #f9f9f9;
+        --bg-today: #fff3e0;
+        --border-today: #e67e22;
+        --bg-weekend: #fdf5f6;
+        --text-weekend: #c0392b;
+        --menu-bg: #ffffff;
+        --menu-border: #ddd;
+    }
+
     body, html {
         margin: 0;
         padding: 0;
@@ -12,17 +49,19 @@
         font-family: sans-serif;
         display: flex;
         flex-direction: column;
-        background: #f4f4f9;
+        background: var(--bg-body);
+        color: var(--text-main);
     }
 
-    /* New Title Bar Styles */
+    /* Title Bar */
     .title-bar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: #2c3e50;
-        color: white;
+        background: var(--bg-title);
+        color: var(--text-title);
         padding: 15px 20px;
+        position: relative;
     }
 
     .app-name {
@@ -44,9 +83,9 @@
     }
 
     .nav-btn {
-        background: #34495e;
-        color: white;
-        border: none;
+        background: rgba(255,255,255,0.1);
+        color: var(--text-title);
+        border: 1px solid rgba(255,255,255,0.2);
         padding: 8px 15px;
         font-size: 1.2em;
         cursor: pointer;
@@ -54,45 +93,126 @@
     }
 
     .nav-btn:hover {
-        background: #465c71;
+        background: rgba(255,255,255,0.2);
+    }
+
+    .right-controls {
+        display: flex;
+        align-items: center;
+        gap: 15px;
     }
 
     .today-display {
         font-size: 1em;
-        color: #bdc3c7;
+        color: rgba(255,255,255,0.7);
     }
 
-    /* Days of the Week Header */
+    .menu-btn {
+        background: none;
+        border: none;
+        color: var(--text-title);
+        font-size: 1.5em;
+        cursor: pointer;
+        padding: 0 5px;
+    }
+
+    /* Settings Menu */
+    .settings-menu {
+        display: none;
+        position: absolute;
+        top: 60px;
+        right: 20px;
+        background: var(--menu-bg);
+        color: var(--text-main);
+        border: 1px solid var(--menu-border);
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 100;
+        width: 250px;
+    }
+
+    .settings-menu.active {
+        display: block;
+    }
+
+    .settings-menu h3 {
+        margin-top: 0;
+        border-bottom: 1px solid var(--menu-border);
+        padding-bottom: 10px;
+    }
+
+    .setting-group {
+        margin-bottom: 15px;
+    }
+
+    .setting-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .setting-group select {
+        width: 100%;
+        padding: 5px;
+        background: var(--bg-body);
+        color: var(--text-main);
+        border: 1px solid var(--menu-border);
+    }
+
+    .checkbox-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+    }
+
+    .checkbox-group label {
+        font-weight: normal;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .apply-btn {
+        width: 100%;
+        padding: 8px;
+        background: #2980b9;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .apply-btn:hover { background: #3498db; }
+
+    /* Calendar Grid */
     .header {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        background: #34495e;
-        color: white;
+        background: var(--bg-header);
+        color: var(--text-title);
         text-align: center;
         font-weight: bold;
     }
     
     .header div {
         padding: 12px 0;
-        border-right: 1px solid #2c3e50;
+        border-right: 1px solid var(--border-color);
     }
     
-    .header div:last-child {
-        border-right: none;
-    }
+    .header div:last-child { border-right: none; }
     
-    /* Calendar Grid */
     .calendar {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
         flex-grow: 1;
         grid-auto-rows: 1fr;
-        background: #ccc; 
+        background: var(--border-color); 
         gap: 1px; 
     }
     
     .day {
-        background: white;
+        background: var(--bg-cell);
         padding: 10px;
         display: flex;
         flex-direction: column;
@@ -101,37 +221,37 @@
         transition: background 0.2s;
     }
     
-    .day:hover {
-        background: #f1f8ff;
-    }
+    .day:hover { background: var(--bg-cell-hover); }
+    .day.empty { background: var(--bg-empty); cursor: default; }
     
-    .day.empty {
-        background: #f9f9f9;
-        cursor: default;
+    .day.weekend {
+        background: var(--bg-weekend);
+    }
+    .day.weekend .date-num {
+        color: var(--text-weekend);
     }
     
     .day.today {
-        background: #fff3e0;
-        box-shadow: inset 0 0 0 3px #e67e22;
+        background: var(--bg-today);
+        box-shadow: inset 0 0 0 3px var(--border-today);
     }
     
     .date-num {
         font-weight: bold;
         margin-bottom: 8px;
-        color: #555;
+        color: var(--text-main);
+        opacity: 0.8;
     }
     
     .event-text {
         font-size: 0.9em;
         white-space: pre-wrap;
         word-break: break-word;
-        color: #222;
     }
 </style>
 </head>
 <body>
 
-<!-- New Title Bar -->
 <div class="title-bar">
     <div class="app-name">Calendar</div>
     <div class="nav-controls">
@@ -139,48 +259,132 @@
         <h2 id="month-year-display">Month Year</h2>
         <button class="nav-btn" id="next-btn">&#9654;</button>
     </div>
-    <div class="today-display" id="today-display"></div>
+    <div class="right-controls">
+        <div class="today-display" id="today-display"></div>
+        <button class="menu-btn" id="menu-btn">&#9776;</button>
+    </div>
+
+    <!-- Settings Menu -->
+    <div class="settings-menu" id="settings-menu">
+        <h3>Settings</h3>
+        
+        <div class="setting-group">
+            <label>Theme</label>
+            <select id="theme-select">
+                <option value="dark">Dark (Default)</option>
+                <option value="light">Light</option>
+            </select>
+        </div>
+
+        <div class="setting-group">
+            <label>Start Day of Week</label>
+            <select id="start-day-select">
+                <option value="0">Sunday</option>
+                <option value="1">Monday (Default)</option>
+                <option value="2">Tuesday</option>
+                <option value="3">Wednesday</option>
+                <option value="4">Thursday</option>
+                <option value="5">Friday</option>
+                <option value="6">Saturday</option>
+            </select>
+        </div>
+
+        <div class="setting-group">
+            <label>Weekends</label>
+            <div class="checkbox-group" id="weekend-checkboxes">
+                <label><input type="checkbox" value="0"> Sun</label>
+                <label><input type="checkbox" value="1"> Mon</label>
+                <label><input type="checkbox" value="2"> Tue</label>
+                <label><input type="checkbox" value="3"> Wed</label>
+                <label><input type="checkbox" value="4"> Thu</label>
+                <label><input type="checkbox" value="5"> Fri</label>
+                <label><input type="checkbox" value="6"> Sat</label>
+            </div>
+        </div>
+
+        <button class="apply-btn" id="apply-btn">Apply & Close</button>
+    </div>
 </div>
 
-<div class="header">
-    <div>Sunday</div><div>Monday</div><div>Tuesday</div><div>Wednesday</div><div>Thursday</div><div>Friday</div><div>Saturday</div>
-</div>
+<div class="header" id="calendar-header"></div>
 <div class="calendar" id="calendar"></div>
 
 <script>
-    const calendarEl = document.getElementById('calendar');
-    const monthYearDisplay = document.getElementById('month-year-display');
-    const todayDisplay = document.getElementById('today-display');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-
-    // Get exact current date for the static "Today" display and highlighting
-    const actualToday = new Date();
+    // --- Configuration & State ---
+    const defaultSettings = {
+        theme: 'dark',
+        startDay: 1, // 1 = Monday
+        weekends: [0, 6] // 0 = Sun, 6 = Sat
+    };
     
-    // Format and display the exact today's date in the top right
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    todayDisplay.textContent = `Today: ${actualToday.toLocaleDateString(undefined, options)}`;
+    let settings = JSON.parse(localStorage.getItem('calendar-settings')) || defaultSettings;
 
-    // State variables for navigation
+    const actualToday = new Date();
     let displayMonth = actualToday.getMonth();
     let displayYear = actualToday.getFullYear();
 
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
+    // --- DOM Elements ---
+    const calendarEl = document.getElementById('calendar');
+    const headerEl = document.getElementById('calendar-header');
+    const monthYearDisplay = document.getElementById('month-year-display');
+    const todayDisplay = document.getElementById('today-display');
+    
+    // Menu Elements
+    const menuBtn = document.getElementById('menu-btn');
+    const settingsMenu = document.getElementById('settings-menu');
+    const themeSelect = document.getElementById('theme-select');
+    const startDaySelect = document.getElementById('start-day-select');
+    const applyBtn = document.getElementById('apply-btn');
+    const weekendCheckboxes = document.querySelectorAll('#weekend-checkboxes input');
+
+    // --- Initialization ---
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    todayDisplay.textContent = `${actualToday.toLocaleDateString(undefined, options)}`;
+
+    function applySettingsToUI() {
+        // Theme
+        if (settings.theme === 'light') {
+            document.body.classList.add('light-theme');
+        } else {
+            document.body.classList.remove('light-theme');
+        }
+        themeSelect.value = settings.theme;
+
+        // Start Day
+        startDaySelect.value = settings.startDay;
+
+        // Weekends
+        weekendCheckboxes.forEach(cb => {
+            cb.checked = settings.weekends.includes(parseInt(cb.value));
+        });
+    }
+
+    // --- Calendar Rendering Logic ---
     function renderCalendar(month, year) {
-        // Clear previous calendar cells
         calendarEl.innerHTML = '';
+        headerEl.innerHTML = '';
         
-        // Update the center title with the month and year currently being viewed
         monthYearDisplay.textContent = `${monthNames[month]} ${year}`;
 
-        const firstDay = new Date(year, month, 1).getDay();
+        // Render Header dynamically based on Start Day
+        for (let i = 0; i < 7; i++) {
+            const dayIndex = (settings.startDay + i) % 7;
+            const dayDiv = document.createElement('div');
+            dayDiv.textContent = dayNames[dayIndex];
+            headerEl.appendChild(dayDiv);
+        }
+
+        // Calculate offset for the first day of the month
+        const firstDayOfMonth = new Date(year, month, 1).getDay();
+        // Math to shift the grid based on the chosen start day
+        const offset = (firstDayOfMonth - settings.startDay + 7) % 7;
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        // Render empty cells for days before the 1st of the month
-        for (let i = 0; i < firstDay; i++) {
+        // Render empty cells
+        for (let i = 0; i < offset; i++) {
             const emptyCell = document.createElement('div');
             emptyCell.classList.add('day', 'empty');
             calendarEl.appendChild(emptyCell);
@@ -191,9 +395,17 @@
             const dayCell = document.createElement('div');
             dayCell.classList.add('day');
             
-            // Check if this specific cell is the real "today"
+            const cellDate = new Date(year, month, i);
+            const dayOfWeek = cellDate.getDay();
+
+            // Highlight Today
             if (i === actualToday.getDate() && month === actualToday.getMonth() && year === actualToday.getFullYear()) {
                 dayCell.classList.add('today');
+            }
+
+            // Highlight Weekends
+            if (settings.weekends.includes(dayOfWeek)) {
+                dayCell.classList.add('weekend');
             }
 
             const dateNum = document.createElement('div');
@@ -204,12 +416,11 @@
             const eventDiv = document.createElement('div');
             eventDiv.classList.add('event-text');
             
-            // Generate a unique storage key for every specific date (e.g., calendar-note-2026-9-15)
             const storageKey = `calendar-note-${year}-${month}-${i}`;
             eventDiv.textContent = localStorage.getItem(storageKey) || '';
             dayCell.appendChild(eventDiv);
 
-            // Click event to add notes
+            // Click to add notes
             dayCell.addEventListener('click', () => {
                 const existingText = localStorage.getItem(storageKey) || '';
                 const newText = prompt(`Enter notes for ${monthNames[month]} ${i}, ${year}:`, existingText);
@@ -224,26 +435,52 @@
         }
     }
 
-    // Event listeners for arrows
-    prevBtn.addEventListener('click', () => {
+    // --- Event Listeners ---
+    document.getElementById('prev-btn').addEventListener('click', () => {
         displayMonth--;
-        if (displayMonth < 0) {
-            displayMonth = 11;
-            displayYear--;
-        }
+        if (displayMonth < 0) { displayMonth = 11; displayYear--; }
         renderCalendar(displayMonth, displayYear);
     });
 
-    nextBtn.addEventListener('click', () => {
+    document.getElementById('next-btn').addEventListener('click', () => {
         displayMonth++;
-        if (displayMonth > 11) {
-            displayMonth = 0;
-            displayYear++;
-        }
+        if (displayMonth > 11) { displayMonth = 0; displayYear++; }
         renderCalendar(displayMonth, displayYear);
     });
 
-    // Initial render
+    // Menu Toggle
+    menuBtn.addEventListener('click', () => {
+        settingsMenu.classList.toggle('active');
+    });
+
+    // Save Settings
+    applyBtn.addEventListener('click', () => {
+        const selectedWeekends = Array.from(weekendCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => parseInt(cb.value));
+
+        settings = {
+            theme: themeSelect.value,
+            startDay: parseInt(startDaySelect.value),
+            weekends: selectedWeekends
+        };
+
+        localStorage.setItem('calendar-settings', JSON.stringify(settings));
+        
+        settingsMenu.classList.remove('active');
+        applySettingsToUI();
+        renderCalendar(displayMonth, displayYear);
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!settingsMenu.contains(e.target) && e.target !== menuBtn) {
+            settingsMenu.classList.remove('active');
+        }
+    });
+
+    // Boot up
+    applySettingsToUI();
     renderCalendar(displayMonth, displayYear);
 
 </script>
