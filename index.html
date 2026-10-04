@@ -22,6 +22,8 @@
         --text-weekend: #ffbba6;
         --menu-bg: #2d2d2d;
         --menu-border: #444;
+        --scroll-thumb: rgba(255, 255, 255, 0.2);
+        --scroll-thumb-hover: rgba(255, 255, 255, 0.4);
     }
 
     body.light-theme {
@@ -40,6 +42,8 @@
         --text-weekend: #c0392b;
         --menu-bg: #ffffff;
         --menu-border: #ddd;
+        --scroll-thumb: rgba(0, 0, 0, 0.2);
+        --scroll-thumb-hover: rgba(0, 0, 0, 0.4);
     }
 
     body, html {
@@ -92,9 +96,7 @@
         border-radius: 4px;
     }
 
-    .nav-btn:hover {
-        background: rgba(255,255,255,0.2);
-    }
+    .nav-btn:hover { background: rgba(255,255,255,0.2); }
 
     .right-controls {
         display: flex;
@@ -132,58 +134,63 @@
         width: 250px;
     }
 
-    .settings-menu.active {
-        display: block;
-    }
-
-    .settings-menu h3 {
-        margin-top: 0;
-        border-bottom: 1px solid var(--menu-border);
-        padding-bottom: 10px;
-    }
-
-    .setting-group {
-        margin-bottom: 15px;
-    }
-
-    .setting-group label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-    }
-
+    .settings-menu.active { display: block; }
+    .settings-menu h3 { margin-top: 0; border-bottom: 1px solid var(--menu-border); padding-bottom: 10px; }
+    .setting-group { margin-bottom: 15px; }
+    .setting-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+    
     .setting-group select {
-        width: 100%;
-        padding: 5px;
-        background: var(--bg-body);
-        color: var(--text-main);
-        border: 1px solid var(--menu-border);
+        width: 100%; padding: 5px; background: var(--bg-body); 
+        color: var(--text-main); border: 1px solid var(--menu-border);
     }
 
-    .checkbox-group {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 5px;
-    }
-
-    .checkbox-group label {
-        font-weight: normal;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
+    .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .checkbox-group label { font-weight: normal; display: flex; align-items: center; gap: 5px; }
 
     .apply-btn {
-        width: 100%;
-        padding: 8px;
-        background: #2980b9;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: bold;
+        width: 100%; padding: 8px; background: #2980b9; color: white;
+        border: none; border-radius: 4px; cursor: pointer; font-weight: bold;
     }
     .apply-btn:hover { background: #3498db; }
+
+    /* Custom Pop-up Modal */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-overlay.active { display: flex; }
+    
+    .modal-content {
+        background: var(--bg-cell);
+        width: 400px; max-width: 90%;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        display: flex; flex-direction: column; gap: 15px;
+    }
+    
+    .modal-content h3 { margin: 0; color: var(--text-main); }
+    
+    .modal-content textarea {
+        width: 100%; box-sizing: border-box;
+        background: var(--bg-body); color: var(--text-main);
+        border: 1px solid var(--border-color);
+        padding: 10px; border-radius: 4px;
+        resize: vertical; font-family: inherit; font-size: 1em;
+    }
+    
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .modal-btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .btn-cancel { background: #7f8c8d; color: white; }
+    .btn-cancel:hover { background: #95a5a6; }
+    .btn-save { background: #27ae60; color: white; }
+    .btn-save:hover { background: #2ecc71; }
 
     /* Calendar Grid */
     .header {
@@ -209,6 +216,7 @@
         grid-auto-rows: 1fr;
         background: var(--border-color); 
         gap: 1px; 
+        overflow: hidden; /* Prevent body scroll */
     }
     
     .day {
@@ -219,17 +227,32 @@
         cursor: pointer;
         overflow-y: auto;
         transition: background 0.2s;
+        
+        /* Custom Thin Scrollbar Firefox */
+        scrollbar-width: thin;
+        scrollbar-color: var(--scroll-thumb) transparent;
+    }
+    
+    /* Custom Thin Scrollbar Webkit (Chrome, Edge, Safari) */
+    .day::-webkit-scrollbar {
+        width: 6px;
+    }
+    .day::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .day::-webkit-scrollbar-thumb {
+        background-color: var(--scroll-thumb);
+        border-radius: 10px;
+    }
+    .day:hover::-webkit-scrollbar-thumb {
+        background-color: var(--scroll-thumb-hover);
     }
     
     .day:hover { background: var(--bg-cell-hover); }
     .day.empty { background: var(--bg-empty); cursor: default; }
     
-    .day.weekend {
-        background: var(--bg-weekend);
-    }
-    .day.weekend .date-num {
-        color: var(--text-weekend);
-    }
+    .day.weekend { background: var(--bg-weekend); }
+    .day.weekend .date-num { color: var(--text-weekend); }
     
     .day.today {
         background: var(--bg-today);
@@ -245,8 +268,9 @@
     
     .event-text {
         font-size: 0.9em;
-        white-space: pre-wrap;
+        white-space: pre-wrap; /* Honors multiple lines */
         word-break: break-word;
+        padding-bottom: 5px;
     }
 </style>
 </head>
@@ -267,7 +291,6 @@
     <!-- Settings Menu -->
     <div class="settings-menu" id="settings-menu">
         <h3>Settings</h3>
-        
         <div class="setting-group">
             <label>Theme</label>
             <select id="theme-select">
@@ -275,7 +298,6 @@
                 <option value="light">Light</option>
             </select>
         </div>
-
         <div class="setting-group">
             <label>Start Day of Week</label>
             <select id="start-day-select">
@@ -288,7 +310,6 @@
                 <option value="6">Saturday</option>
             </select>
         </div>
-
         <div class="setting-group">
             <label>Weekends</label>
             <div class="checkbox-group" id="weekend-checkboxes">
@@ -301,7 +322,6 @@
                 <label><input type="checkbox" value="6"> Sat</label>
             </div>
         </div>
-
         <button class="apply-btn" id="apply-btn">Apply & Close</button>
     </div>
 </div>
@@ -309,14 +329,21 @@
 <div class="header" id="calendar-header"></div>
 <div class="calendar" id="calendar"></div>
 
+<!-- Multiline Note Modal -->
+<div class="modal-overlay" id="note-modal">
+    <div class="modal-content">
+        <h3 id="modal-title">Edit Note</h3>
+        <textarea id="modal-textarea" rows="6" placeholder="Type your multiline note here..."></textarea>
+        <div class="modal-actions">
+            <button class="modal-btn btn-cancel" id="modal-cancel">Cancel</button>
+            <button class="modal-btn btn-save" id="modal-save">Save</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // --- Configuration & State ---
-    const defaultSettings = {
-        theme: 'dark',
-        startDay: 1, // 1 = Monday
-        weekends: [0, 6] // 0 = Sun, 6 = Sat
-    };
-    
+    const defaultSettings = { theme: 'dark', startDay: 1, weekends: [0, 6] };
     let settings = JSON.parse(localStorage.getItem('calendar-settings')) || defaultSettings;
 
     const actualToday = new Date();
@@ -332,7 +359,6 @@
     const monthYearDisplay = document.getElementById('month-year-display');
     const todayDisplay = document.getElementById('today-display');
     
-    // Menu Elements
     const menuBtn = document.getElementById('menu-btn');
     const settingsMenu = document.getElementById('settings-menu');
     const themeSelect = document.getElementById('theme-select');
@@ -340,23 +366,28 @@
     const applyBtn = document.getElementById('apply-btn');
     const weekendCheckboxes = document.querySelectorAll('#weekend-checkboxes input');
 
+    // Modal Elements
+    const noteModal = document.getElementById('note-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalTextarea = document.getElementById('modal-textarea');
+    const modalSaveBtn = document.getElementById('modal-save');
+    const modalCancelBtn = document.getElementById('modal-cancel');
+    
+    // Track what is currently being edited
+    let currentEditKey = null;
+    let currentEditDiv = null;
+
     // --- Initialization ---
     const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
     todayDisplay.textContent = `${actualToday.toLocaleDateString(undefined, options)}`;
 
     function applySettingsToUI() {
-        // Theme
-        if (settings.theme === 'light') {
-            document.body.classList.add('light-theme');
-        } else {
-            document.body.classList.remove('light-theme');
-        }
+        if (settings.theme === 'light') document.body.classList.add('light-theme');
+        else document.body.classList.remove('light-theme');
+        
         themeSelect.value = settings.theme;
-
-        // Start Day
         startDaySelect.value = settings.startDay;
-
-        // Weekends
+        
         weekendCheckboxes.forEach(cb => {
             cb.checked = settings.weekends.includes(parseInt(cb.value));
         });
@@ -369,7 +400,6 @@
         
         monthYearDisplay.textContent = `${monthNames[month]} ${year}`;
 
-        // Render Header dynamically based on Start Day
         for (let i = 0; i < 7; i++) {
             const dayIndex = (settings.startDay + i) % 7;
             const dayDiv = document.createElement('div');
@@ -377,20 +407,16 @@
             headerEl.appendChild(dayDiv);
         }
 
-        // Calculate offset for the first day of the month
         const firstDayOfMonth = new Date(year, month, 1).getDay();
-        // Math to shift the grid based on the chosen start day
         const offset = (firstDayOfMonth - settings.startDay + 7) % 7;
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        // Render empty cells
         for (let i = 0; i < offset; i++) {
             const emptyCell = document.createElement('div');
             emptyCell.classList.add('day', 'empty');
             calendarEl.appendChild(emptyCell);
         }
 
-        // Render actual days
         for (let i = 1; i <= daysInMonth; i++) {
             const dayCell = document.createElement('div');
             dayCell.classList.add('day');
@@ -398,12 +424,9 @@
             const cellDate = new Date(year, month, i);
             const dayOfWeek = cellDate.getDay();
 
-            // Highlight Today
             if (i === actualToday.getDate() && month === actualToday.getMonth() && year === actualToday.getFullYear()) {
                 dayCell.classList.add('today');
             }
-
-            // Highlight Weekends
             if (settings.weekends.includes(dayOfWeek)) {
                 dayCell.classList.add('weekend');
             }
@@ -420,15 +443,14 @@
             eventDiv.textContent = localStorage.getItem(storageKey) || '';
             dayCell.appendChild(eventDiv);
 
-            // Click to add notes
+            // Open Modal for Multiline Editing
             dayCell.addEventListener('click', () => {
-                const existingText = localStorage.getItem(storageKey) || '';
-                const newText = prompt(`Enter notes for ${monthNames[month]} ${i}, ${year}:`, existingText);
-                
-                if (newText !== null) {
-                    localStorage.setItem(storageKey, newText);
-                    eventDiv.textContent = newText;
-                }
+                currentEditKey = storageKey;
+                currentEditDiv = eventDiv;
+                modalTitle.textContent = `Notes for ${monthNames[month]} ${i}, ${year}`;
+                modalTextarea.value = localStorage.getItem(storageKey) || '';
+                noteModal.classList.add('active');
+                modalTextarea.focus();
             });
 
             calendarEl.appendChild(dayCell);
@@ -448,25 +470,15 @@
         renderCalendar(displayMonth, displayYear);
     });
 
-    // Menu Toggle
-    menuBtn.addEventListener('click', () => {
-        settingsMenu.classList.toggle('active');
-    });
+    // Menu Logic
+    menuBtn.addEventListener('click', () => settingsMenu.classList.toggle('active'));
 
-    // Save Settings
     applyBtn.addEventListener('click', () => {
         const selectedWeekends = Array.from(weekendCheckboxes)
             .filter(cb => cb.checked)
             .map(cb => parseInt(cb.value));
-
-        settings = {
-            theme: themeSelect.value,
-            startDay: parseInt(startDaySelect.value),
-            weekends: selectedWeekends
-        };
-
+        settings = { theme: themeSelect.value, startDay: parseInt(startDaySelect.value), weekends: selectedWeekends };
         localStorage.setItem('calendar-settings', JSON.stringify(settings));
-        
         settingsMenu.classList.remove('active');
         applySettingsToUI();
         renderCalendar(displayMonth, displayYear);
@@ -477,6 +489,25 @@
         if (!settingsMenu.contains(e.target) && e.target !== menuBtn) {
             settingsMenu.classList.remove('active');
         }
+    });
+
+    // Modal Action Logic
+    modalSaveBtn.addEventListener('click', () => {
+        if (currentEditKey && currentEditDiv) {
+            const newText = modalTextarea.value;
+            localStorage.setItem(currentEditKey, newText);
+            currentEditDiv.textContent = newText;
+        }
+        noteModal.classList.remove('active');
+    });
+
+    modalCancelBtn.addEventListener('click', () => {
+        noteModal.classList.remove('active');
+    });
+
+    // Close modal if overlay is clicked
+    noteModal.addEventListener('click', (e) => {
+        if (e.target === noteModal) noteModal.classList.remove('active');
     });
 
     // Boot up
