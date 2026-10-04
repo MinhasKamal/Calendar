@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Full Screen Calendar</title>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .header {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        background: #333;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    .header div {
+        padding: 15px 0;
+        border-right: 1px solid #555;
+    }
+    
+    .header div:last-child {
+        border-right: none;
+    }
+    
+    .calendar {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        flex-grow: 1;
+        grid-auto-rows: 1fr;
+        background: #ccc; /* Acts as border color between cells */
+        gap: 1px; 
+    }
+    
+    .day {
+        background: white;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+        overflow-y: auto;
+    }
+    
+    .day:hover {
+        background: #f1f8ff;
+    }
+    
+    .day.empty {
+        background: #f9f9f9;
+        cursor: default;
+    }
+    
+    .day.today {
+        background: #fff3e0;
+        box-shadow: inset 0 0 0 3px #ff9800;
+    }
+    
+    .date-num {
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #555;
+    }
+    
+    .event-text {
+        font-size: 0.9em;
+        white-space: pre-wrap;
+        word-break: break-word;
+        color: #222;
+    }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div>Sunday</div><div>Monday</div><div>Tuesday</div><div>Wednesday</div><div>Thursday</div><div>Friday</div><div>Saturday</div>
+</div>
+<div class="calendar" id="calendar"></div>
+
+<script>
+    const calendarEl = document.getElementById('calendar');
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const currentDate = today.getDate();
+
+    // Determine the first day of the week and total days in the current month
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+    // Render empty cells for days from the previous month
+    for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.classList.add('day', 'empty');
+        calendarEl.appendChild(emptyCell);
+    }
+
+    // Render the actual days of the current month
+    for (let i = 1; i <= daysInMonth; i++) {
+        const dayCell = document.createElement('div');
+        dayCell.classList.add('day');
+        
+        if (i === currentDate) {
+            dayCell.classList.add('today');
+        }
+
+        // Create the date number label
+        const dateNum = document.createElement('div');
+        dateNum.classList.add('date-num');
+        dateNum.textContent = i;
+        dayCell.appendChild(dateNum);
+
+        // Create the container for the saved text
+        const eventDiv = document.createElement('div');
+        eventDiv.classList.add('event-text');
+        
+        // Load existing text from localStorage
+        const storageKey = `calendar-note-${currentYear}-${currentMonth}-${i}`;
+        eventDiv.textContent = localStorage.getItem(storageKey) || '';
+        dayCell.appendChild(eventDiv);
+
+        // Handle clicks to add or edit text
+        dayCell.addEventListener('click', () => {
+            const existingText = localStorage.getItem(storageKey) || '';
+            const newText = prompt(`Enter notes for ${currentMonth + 1}/${i}/${currentYear}:`, existingText);
+            
+            // If the user didn't cancel the prompt, save the data
+            if (newText !== null) {
+                localStorage.setItem(storageKey, newText);
+                eventDiv.textContent = newText;
+            }
+        });
+
+        calendarEl.appendChild(dayCell);
+    }
+</script>
+</body>
+</html>
