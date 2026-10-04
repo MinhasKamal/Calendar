@@ -12,32 +12,82 @@
         font-family: sans-serif;
         display: flex;
         flex-direction: column;
+        background: #f4f4f9;
     }
-    
+
+    /* New Title Bar Styles */
+    .title-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #2c3e50;
+        color: white;
+        padding: 15px 20px;
+    }
+
+    .app-name {
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    .nav-controls {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .nav-controls h2 {
+        margin: 0;
+        font-size: 1.3em;
+        width: 200px;
+        text-align: center;
+    }
+
+    .nav-btn {
+        background: #34495e;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        font-size: 1.2em;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    .nav-btn:hover {
+        background: #465c71;
+    }
+
+    .today-display {
+        font-size: 1em;
+        color: #bdc3c7;
+    }
+
+    /* Days of the Week Header */
     .header {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        background: #333;
+        background: #34495e;
         color: white;
         text-align: center;
         font-weight: bold;
     }
     
     .header div {
-        padding: 15px 0;
-        border-right: 1px solid #555;
+        padding: 12px 0;
+        border-right: 1px solid #2c3e50;
     }
     
     .header div:last-child {
         border-right: none;
     }
     
+    /* Calendar Grid */
     .calendar {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
         flex-grow: 1;
         grid-auto-rows: 1fr;
-        background: #ccc; /* Acts as border color between cells */
+        background: #ccc; 
         gap: 1px; 
     }
     
@@ -48,6 +98,7 @@
         flex-direction: column;
         cursor: pointer;
         overflow-y: auto;
+        transition: background 0.2s;
     }
     
     .day:hover {
@@ -61,7 +112,7 @@
     
     .day.today {
         background: #fff3e0;
-        box-shadow: inset 0 0 0 3px #ff9800;
+        box-shadow: inset 0 0 0 3px #e67e22;
     }
     
     .date-num {
@@ -80,6 +131,17 @@
 </head>
 <body>
 
+<!-- New Title Bar -->
+<div class="title-bar">
+    <div class="app-name">Calendar</div>
+    <div class="nav-controls">
+        <button class="nav-btn" id="prev-btn">&#9664;</button>
+        <h2 id="month-year-display">Month Year</h2>
+        <button class="nav-btn" id="next-btn">&#9654;</button>
+    </div>
+    <div class="today-display" id="today-display"></div>
+</div>
+
 <div class="header">
     <div>Sunday</div><div>Monday</div><div>Tuesday</div><div>Wednesday</div><div>Thursday</div><div>Friday</div><div>Saturday</div>
 </div>
@@ -87,60 +149,103 @@
 
 <script>
     const calendarEl = document.getElementById('calendar');
-    const today = new Date();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
-    const currentDate = today.getDate();
+    const monthYearDisplay = document.getElementById('month-year-display');
+    const todayDisplay = document.getElementById('today-display');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
 
-    // Determine the first day of the week and total days in the current month
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    // Get exact current date for the static "Today" display and highlighting
+    const actualToday = new Date();
+    
+    // Format and display the exact today's date in the top right
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    todayDisplay.textContent = `Today: ${actualToday.toLocaleDateString(undefined, options)}`;
 
-    // Render empty cells for days from the previous month
-    for (let i = 0; i < firstDay; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.classList.add('day', 'empty');
-        calendarEl.appendChild(emptyCell);
-    }
+    // State variables for navigation
+    let displayMonth = actualToday.getMonth();
+    let displayYear = actualToday.getFullYear();
 
-    // Render the actual days of the current month
-    for (let i = 1; i <= daysInMonth; i++) {
-        const dayCell = document.createElement('div');
-        dayCell.classList.add('day');
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    function renderCalendar(month, year) {
+        // Clear previous calendar cells
+        calendarEl.innerHTML = '';
         
-        if (i === currentDate) {
-            dayCell.classList.add('today');
+        // Update the center title with the month and year currently being viewed
+        monthYearDisplay.textContent = `${monthNames[month]} ${year}`;
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Render empty cells for days before the 1st of the month
+        for (let i = 0; i < firstDay; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.classList.add('day', 'empty');
+            calendarEl.appendChild(emptyCell);
         }
 
-        // Create the date number label
-        const dateNum = document.createElement('div');
-        dateNum.classList.add('date-num');
-        dateNum.textContent = i;
-        dayCell.appendChild(dateNum);
-
-        // Create the container for the saved text
-        const eventDiv = document.createElement('div');
-        eventDiv.classList.add('event-text');
-        
-        // Load existing text from localStorage
-        const storageKey = `calendar-note-${currentYear}-${currentMonth}-${i}`;
-        eventDiv.textContent = localStorage.getItem(storageKey) || '';
-        dayCell.appendChild(eventDiv);
-
-        // Handle clicks to add or edit text
-        dayCell.addEventListener('click', () => {
-            const existingText = localStorage.getItem(storageKey) || '';
-            const newText = prompt(`Enter notes for ${currentMonth + 1}/${i}/${currentYear}:`, existingText);
+        // Render actual days
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dayCell = document.createElement('div');
+            dayCell.classList.add('day');
             
-            // If the user didn't cancel the prompt, save the data
-            if (newText !== null) {
-                localStorage.setItem(storageKey, newText);
-                eventDiv.textContent = newText;
+            // Check if this specific cell is the real "today"
+            if (i === actualToday.getDate() && month === actualToday.getMonth() && year === actualToday.getFullYear()) {
+                dayCell.classList.add('today');
             }
-        });
 
-        calendarEl.appendChild(dayCell);
+            const dateNum = document.createElement('div');
+            dateNum.classList.add('date-num');
+            dateNum.textContent = i;
+            dayCell.appendChild(dateNum);
+
+            const eventDiv = document.createElement('div');
+            eventDiv.classList.add('event-text');
+            
+            // Generate a unique storage key for every specific date (e.g., calendar-note-2026-9-15)
+            const storageKey = `calendar-note-${year}-${month}-${i}`;
+            eventDiv.textContent = localStorage.getItem(storageKey) || '';
+            dayCell.appendChild(eventDiv);
+
+            // Click event to add notes
+            dayCell.addEventListener('click', () => {
+                const existingText = localStorage.getItem(storageKey) || '';
+                const newText = prompt(`Enter notes for ${monthNames[month]} ${i}, ${year}:`, existingText);
+                
+                if (newText !== null) {
+                    localStorage.setItem(storageKey, newText);
+                    eventDiv.textContent = newText;
+                }
+            });
+
+            calendarEl.appendChild(dayCell);
+        }
     }
+
+    // Event listeners for arrows
+    prevBtn.addEventListener('click', () => {
+        displayMonth--;
+        if (displayMonth < 0) {
+            displayMonth = 11;
+            displayYear--;
+        }
+        renderCalendar(displayMonth, displayYear);
+    });
+
+    nextBtn.addEventListener('click', () => {
+        displayMonth++;
+        if (displayMonth > 11) {
+            displayMonth = 0;
+            displayYear++;
+        }
+        renderCalendar(displayMonth, displayYear);
+    });
+
+    // Initial render
+    renderCalendar(displayMonth, displayYear);
+
 </script>
 </body>
 </html>
