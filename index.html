@@ -16,14 +16,13 @@
         --bg-cell: #1e1e1e;
         --bg-cell-hover: #2c2c2c;
         --bg-empty: #121212;
-        --bg-today: #3e2723;
         --border-today: #ff9800;
-        --bg-weekend: #2a1b1b;
         --text-weekend: #ffbba6;
         --menu-bg: #2d2d2d;
         --menu-border: #444;
         --scroll-thumb: rgba(255, 255, 255, 0.2);
         --scroll-thumb-hover: rgba(255, 255, 255, 0.4);
+        --resizer-hover: #2980b9;
     }
 
     body.light-theme {
@@ -36,14 +35,13 @@
         --bg-cell: #ffffff;
         --bg-cell-hover: #f1f8ff;
         --bg-empty: #f9f9f9;
-        --bg-today: #fff3e0;
         --border-today: #e67e22;
-        --bg-weekend: #fdf5f6;
         --text-weekend: #c0392b;
         --menu-bg: #ffffff;
         --menu-border: #ddd;
         --scroll-thumb: rgba(0, 0, 0, 0.2);
         --scroll-thumb-hover: rgba(0, 0, 0, 0.4);
+        --resizer-hover: #3498db;
     }
 
     body, html {
@@ -55,98 +53,46 @@
         flex-direction: column;
         background: var(--bg-body);
         color: var(--text-main);
+        overflow: hidden; /* Prevent scrolling on body */
     }
 
     /* Title Bar */
     .title-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: var(--bg-title);
-        color: var(--text-title);
-        padding: 15px 20px;
-        position: relative;
+        display: flex; justify-content: space-between; align-items: center;
+        background: var(--bg-title); color: var(--text-title);
+        padding: 15px 20px; position: relative; flex-shrink: 0;
     }
 
-    .app-name {
-        font-size: 1.5em;
-        font-weight: bold;
-    }
-
-    .nav-controls {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .nav-controls h2 {
-        margin: 0;
-        font-size: 1.3em;
-        width: 200px;
-        text-align: center;
-    }
-
+    .app-name { font-size: 1.5em; font-weight: bold; }
+    .nav-controls { display: flex; align-items: center; gap: 15px; }
+    .nav-controls h2 { margin: 0; font-size: 1.3em; width: 200px; text-align: center; }
+    
     .nav-btn {
-        background: rgba(255,255,255,0.1);
-        color: var(--text-title);
-        border: 1px solid rgba(255,255,255,0.2);
-        padding: 8px 15px;
-        font-size: 1.2em;
-        cursor: pointer;
-        border-radius: 4px;
+        background: rgba(255,255,255,0.1); color: var(--text-title);
+        border: 1px solid rgba(255,255,255,0.2); padding: 8px 15px;
+        font-size: 1.2em; cursor: pointer; border-radius: 4px;
     }
-
     .nav-btn:hover { background: rgba(255,255,255,0.2); }
 
-    .right-controls {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .today-display {
-        font-size: 1em;
-        color: rgba(255,255,255,0.7);
-    }
-
-    .menu-btn {
-        background: none;
-        border: none;
-        color: var(--text-title);
-        font-size: 1.5em;
-        cursor: pointer;
-        padding: 0 5px;
-    }
+    .right-controls { display: flex; align-items: center; gap: 15px; }
+    .today-display { font-size: 1em; color: rgba(255,255,255,0.7); }
+    .menu-btn { background: none; border: none; color: var(--text-title); font-size: 1.5em; cursor: pointer; padding: 0 5px; }
 
     /* Settings Menu */
     .settings-menu {
-        display: none;
-        position: absolute;
-        top: 60px;
-        right: 20px;
-        background: var(--menu-bg);
-        color: var(--text-main);
-        border: 1px solid var(--menu-border);
-        border-radius: 8px;
-        padding: 15px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        z-index: 100;
-        width: 250px;
+        display: none; position: absolute; top: 60px; right: 20px;
+        background: var(--menu-bg); color: var(--text-main);
+        border: 1px solid var(--menu-border); border-radius: 8px;
+        padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100; width: 250px;
     }
-
     .settings-menu.active { display: block; }
     .settings-menu h3 { margin-top: 0; border-bottom: 1px solid var(--menu-border); padding-bottom: 10px; }
     .setting-group { margin-bottom: 15px; }
     .setting-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-    
-    .setting-group select {
-        width: 100%; padding: 5px; background: var(--bg-body); 
-        color: var(--text-main); border: 1px solid var(--menu-border);
-    }
-
+    .setting-group select { width: 100%; padding: 5px; background: var(--bg-body); color: var(--text-main); border: 1px solid var(--menu-border); }
     .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
     .checkbox-group label { font-weight: normal; display: flex; align-items: center; gap: 5px; }
-
+    
     .apply-btn {
         width: 100%; padding: 8px; background: #2980b9; color: white;
         border: none; border-radius: 4px; cursor: pointer; font-weight: bold;
@@ -155,33 +101,24 @@
 
     /* Custom Pop-up Modal */
     .modal-overlay {
-        display: none;
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 1000;
-        align-items: center;
-        justify-content: center;
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.6); z-index: 1000; align-items: center; justify-content: center;
     }
-    
     .modal-overlay.active { display: flex; }
     
     .modal-content {
-        background: var(--bg-cell);
-        width: 400px; max-width: 90%;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        background: var(--bg-cell); width: 400px; max-width: 90%; padding: 20px;
+        border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         display: flex; flex-direction: column; gap: 15px;
     }
-    
     .modal-content h3 { margin: 0; color: var(--text-main); }
     
+    .color-picker-row { display: flex; align-items: center; gap: 10px; }
+    .color-picker-row input[type="color"] { cursor: pointer; height: 30px; width: 50px; padding: 0; border: 1px solid var(--border-color); border-radius: 4px; }
+    
     .modal-content textarea {
-        width: 100%; box-sizing: border-box;
-        background: var(--bg-body); color: var(--text-main);
-        border: 1px solid var(--border-color);
-        padding: 10px; border-radius: 4px;
+        width: 100%; box-sizing: border-box; background: var(--bg-body); color: var(--text-main);
+        border: 1px solid var(--border-color); padding: 10px; border-radius: 4px;
         resize: vertical; font-family: inherit; font-size: 1em;
     }
     
@@ -191,87 +128,102 @@
     .btn-cancel:hover { background: #95a5a6; }
     .btn-save { background: #27ae60; color: white; }
     .btn-save:hover { background: #2ecc71; }
+    .btn-clear { background: #e74c3c; color: white; padding: 6px 12px; font-size: 0.9em; }
+    .btn-clear:hover { background: #c0392b; }
+
+    /* Layout for Calendar + Notes Sidebar */
+    .main-layout {
+        display: flex;
+        flex: 1;
+        width: 100%;
+        overflow: hidden;
+    }
+    
+    .calendar-wrapper {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 75%; /* Default Width */
+        min-width: 300px;
+    }
+    
+    /* Resizer Bar */
+    .resizer {
+        width: 5px;
+        background: var(--border-color);
+        cursor: col-resize;
+        transition: background 0.2s;
+        z-index: 10;
+    }
+    .resizer:hover, .resizer.resizing {
+        background: var(--resizer-hover);
+    }
+    
+    /* Notes Sidebar */
+    .notes-wrapper {
+        flex: 0 0 25%; /* Default Width */
+        min-width: 150px;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-cell);
+        border-left: 1px solid var(--border-color);
+    }
+    
+    .notes-header {
+        background: var(--bg-header);
+        color: var(--text-title);
+        padding: 12px 15px;
+        font-weight: bold;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    #global-notes {
+        flex: 1;
+        width: 100%;
+        box-sizing: border-box;
+        background: var(--bg-body);
+        color: var(--text-main);
+        border: none;
+        padding: 15px;
+        resize: none;
+        font-family: inherit;
+        font-size: 1em;
+    }
+    #global-notes:focus { outline: none; }
 
     /* Calendar Grid */
     .header {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        background: var(--bg-header);
-        color: var(--text-title);
-        text-align: center;
-        font-weight: bold;
+        display: grid; grid-template-columns: repeat(7, 1fr);
+        background: var(--bg-header); color: var(--text-title);
+        text-align: center; font-weight: bold;
     }
-    
-    .header div {
-        padding: 12px 0;
-        border-right: 1px solid var(--border-color);
-    }
-    
+    .header div { padding: 12px 0; border-right: 1px solid var(--border-color); }
     .header div:last-child { border-right: none; }
     
     .calendar {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        flex-grow: 1;
-        grid-auto-rows: 1fr;
-        background: var(--border-color); 
-        gap: 1px; 
-        overflow: hidden; /* Prevent body scroll */
+        display: grid; grid-template-columns: repeat(7, 1fr);
+        flex-grow: 1; grid-auto-rows: 1fr; background: var(--border-color); 
+        gap: 1px; overflow: hidden;
     }
     
     .day {
-        background: var(--bg-cell);
-        padding: 10px;
-        display: flex;
-        flex-direction: column;
-        cursor: pointer;
-        overflow-y: auto;
-        transition: background 0.2s;
-        
-        /* Custom Thin Scrollbar Firefox */
-        scrollbar-width: thin;
-        scrollbar-color: var(--scroll-thumb) transparent;
+        background: var(--bg-cell); padding: 10px; display: flex; flex-direction: column;
+        cursor: pointer; overflow-y: auto; transition: background 0.2s;
+        scrollbar-width: thin; scrollbar-color: var(--scroll-thumb) transparent;
+        /* Highlight on hover gently so they know it is clickable */
     }
-    
-    /* Custom Thin Scrollbar Webkit (Chrome, Edge, Safari) */
-    .day::-webkit-scrollbar {
-        width: 6px;
-    }
-    .day::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    .day::-webkit-scrollbar-thumb {
-        background-color: var(--scroll-thumb);
-        border-radius: 10px;
-    }
-    .day:hover::-webkit-scrollbar-thumb {
-        background-color: var(--scroll-thumb-hover);
-    }
+    .day::-webkit-scrollbar { width: 6px; }
+    .day::-webkit-scrollbar-track { background: transparent; }
+    .day::-webkit-scrollbar-thumb { background-color: var(--scroll-thumb); border-radius: 10px; }
+    .day:hover::-webkit-scrollbar-thumb { background-color: var(--scroll-thumb-hover); }
     
     .day:hover { background: var(--bg-cell-hover); }
     .day.empty { background: var(--bg-empty); cursor: default; }
     
-    .day.weekend { background: var(--bg-weekend); }
     .day.weekend .date-num { color: var(--text-weekend); }
+    .day.today { box-shadow: inset 0 0 0 3px var(--border-today); }
     
-    .day.today {
-        background: var(--bg-today);
-        box-shadow: inset 0 0 0 3px var(--border-today);
-    }
-    
-    .date-num {
-        font-weight: bold;
-        margin-bottom: 8px;
-        color: var(--text-main);
-        opacity: 0.8;
-    }
-    
-    .event-text {
-        font-size: 0.9em;
-        white-space: pre-wrap; /* Honors multiple lines */
-        word-break: break-word;
-        padding-bottom: 5px;
-    }
+    .date-num { font-weight: bold; margin-bottom: 8px; color: var(--text-main); opacity: 0.8; pointer-events: none; }
+    .event-text { font-size: 0.9em; white-space: pre-wrap; word-break: break-word; padding-bottom: 5px; color: var(--text-main); pointer-events: none;}
 </style>
 </head>
 <body>
@@ -326,14 +278,36 @@
     </div>
 </div>
 
-<div class="header" id="calendar-header"></div>
-<div class="calendar" id="calendar"></div>
+<!-- Main Layout wrapper for Calendar and Sidebar -->
+<div class="main-layout">
+    
+    <div class="calendar-wrapper" id="calendar-wrapper">
+        <div class="header" id="calendar-header"></div>
+        <div class="calendar" id="calendar"></div>
+    </div>
+    
+    <div class="resizer" id="resizer"></div>
+    
+    <div class="notes-wrapper" id="notes-wrapper">
+        <div class="notes-header">Global Notes</div>
+        <textarea id="global-notes" placeholder="Keep permanent notes here..."></textarea>
+    </div>
 
-<!-- Multiline Note Modal -->
+</div>
+
+<!-- Multiline Note & Color Modal -->
 <div class="modal-overlay" id="note-modal">
     <div class="modal-content">
         <h3 id="modal-title">Edit Note</h3>
+        
+        <div class="color-picker-row">
+            <label>Day Color:</label>
+            <input type="color" id="modal-color">
+            <button class="modal-btn btn-clear" id="modal-clear-color" type="button">Reset Default</button>
+        </div>
+
         <textarea id="modal-textarea" rows="6" placeholder="Type your multiline note here..."></textarea>
+        
         <div class="modal-actions">
             <button class="modal-btn btn-cancel" id="modal-cancel">Cancel</button>
             <button class="modal-btn btn-save" id="modal-save">Save</button>
@@ -366,20 +340,42 @@
     const applyBtn = document.getElementById('apply-btn');
     const weekendCheckboxes = document.querySelectorAll('#weekend-checkboxes input');
 
+    // Layout Resizer Elements
+    const resizer = document.getElementById('resizer');
+    const calendarWrapper = document.getElementById('calendar-wrapper');
+    const notesWrapper = document.getElementById('notes-wrapper');
+    const globalNotesArea = document.getElementById('global-notes');
+
     // Modal Elements
     const noteModal = document.getElementById('note-modal');
     const modalTitle = document.getElementById('modal-title');
     const modalTextarea = document.getElementById('modal-textarea');
+    const modalColor = document.getElementById('modal-color');
+    const modalClearColor = document.getElementById('modal-clear-color');
     const modalSaveBtn = document.getElementById('modal-save');
     const modalCancelBtn = document.getElementById('modal-cancel');
     
-    // Track what is currently being edited
     let currentEditKey = null;
     let currentEditDiv = null;
+    let currentEditCell = null;
+    let customColorSelected = '';
 
     // --- Initialization ---
     const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
     todayDisplay.textContent = `${actualToday.toLocaleDateString(undefined, options)}`;
+    
+    // Load saved flexbox split width (defaults to 75% calendar)
+    let savedSplit = localStorage.getItem('calendar-layout-split') || 75;
+    calendarWrapper.style.flex = `1 1 ${savedSplit}%`;
+    notesWrapper.style.flex = `0 0 ${100 - savedSplit}%`;
+    
+    // Load global notes
+    globalNotesArea.value = localStorage.getItem('global-calendar-notes') || '';
+    
+    // Auto-save global notes as user types
+    globalNotesArea.addEventListener('input', () => {
+        localStorage.setItem('global-calendar-notes', globalNotesArea.value);
+    });
 
     function applySettingsToUI() {
         if (settings.theme === 'light') document.body.classList.add('light-theme');
@@ -391,6 +387,17 @@
         weekendCheckboxes.forEach(cb => {
             cb.checked = settings.weekends.includes(parseInt(cb.value));
         });
+    }
+
+    function getStoredDayData(key) {
+        const raw = localStorage.getItem(key);
+        if (!raw) return { text: '', color: '' };
+        try {
+            const parsed = JSON.parse(raw);
+            return { text: parsed.text || '', color: parsed.color || '' };
+        } catch (e) {
+            return { text: raw, color: '' };
+        }
     }
 
     // --- Calendar Rendering Logic ---
@@ -440,15 +447,33 @@
             eventDiv.classList.add('event-text');
             
             const storageKey = `calendar-note-${year}-${month}-${i}`;
-            eventDiv.textContent = localStorage.getItem(storageKey) || '';
+            const dayData = getStoredDayData(storageKey);
+            
+            eventDiv.textContent = dayData.text;
+            if (dayData.color) {
+                dayCell.style.backgroundColor = dayData.color;
+            }
+            
             dayCell.appendChild(eventDiv);
 
-            // Open Modal for Multiline Editing
-            dayCell.addEventListener('click', () => {
+            // CHANGED: Double Click opens modal
+            dayCell.addEventListener('dblclick', () => {
+                const currentData = getStoredDayData(storageKey);
                 currentEditKey = storageKey;
                 currentEditDiv = eventDiv;
+                currentEditCell = dayCell;
+                
                 modalTitle.textContent = `Notes for ${monthNames[month]} ${i}, ${year}`;
-                modalTextarea.value = localStorage.getItem(storageKey) || '';
+                modalTextarea.value = currentData.text;
+                
+                if (currentData.color) {
+                    modalColor.value = currentData.color;
+                    customColorSelected = currentData.color;
+                } else {
+                    modalColor.value = settings.theme === 'light' ? '#ffffff' : '#1e1e1e';
+                    customColorSelected = '';
+                }
+
                 noteModal.classList.add('active');
                 modalTextarea.focus();
             });
@@ -456,6 +481,40 @@
             calendarEl.appendChild(dayCell);
         }
     }
+
+    // --- Layout Drag Resizer Logic ---
+    let isResizing = false;
+
+    resizer.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        document.body.style.cursor = 'col-resize';
+        resizer.classList.add('resizing');
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        
+        // Calculate percentages based on mouse movement across the layout container
+        const containerWidth = document.querySelector('.main-layout').offsetWidth;
+        const newCalendarWidthPercent = (e.clientX / containerWidth) * 100;
+        
+        // Keep constraints so panels don't disappear completely
+        if (newCalendarWidthPercent > 30 && newCalendarWidthPercent < 85) {
+            calendarWrapper.style.flex = `1 1 ${newCalendarWidthPercent}%`;
+            notesWrapper.style.flex = `0 0 ${100 - newCalendarWidthPercent}%`;
+            savedSplit = newCalendarWidthPercent; // Remember current split
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = ''; // Reset cursor
+            resizer.classList.remove('resizing');
+            // Save layout size to local storage
+            localStorage.setItem('calendar-layout-split', savedSplit);
+        }
+    });
 
     // --- Event Listeners ---
     document.getElementById('prev-btn').addEventListener('click', () => {
@@ -474,9 +533,7 @@
     menuBtn.addEventListener('click', () => settingsMenu.classList.toggle('active'));
 
     applyBtn.addEventListener('click', () => {
-        const selectedWeekends = Array.from(weekendCheckboxes)
-            .filter(cb => cb.checked)
-            .map(cb => parseInt(cb.value));
+        const selectedWeekends = Array.from(weekendCheckboxes).filter(cb => cb.checked).map(cb => parseInt(cb.value));
         settings = { theme: themeSelect.value, startDay: parseInt(startDaySelect.value), weekends: selectedWeekends };
         localStorage.setItem('calendar-settings', JSON.stringify(settings));
         settingsMenu.classList.remove('active');
@@ -484,31 +541,32 @@
         renderCalendar(displayMonth, displayYear);
     });
 
-    // Close menu when clicking outside
     document.addEventListener('click', (e) => {
-        if (!settingsMenu.contains(e.target) && e.target !== menuBtn) {
-            settingsMenu.classList.remove('active');
-        }
+        if (!settingsMenu.contains(e.target) && e.target !== menuBtn) settingsMenu.classList.remove('active');
     });
 
     // Modal Action Logic
+    modalColor.addEventListener('input', (e) => customColorSelected = e.target.value);
+    modalClearColor.addEventListener('click', () => {
+        customColorSelected = '';
+        modalColor.value = settings.theme === 'light' ? '#ffffff' : '#1e1e1e';
+    });
+
     modalSaveBtn.addEventListener('click', () => {
-        if (currentEditKey && currentEditDiv) {
+        if (currentEditKey && currentEditDiv && currentEditCell) {
             const newText = modalTextarea.value;
-            localStorage.setItem(currentEditKey, newText);
+            const dataToSave = { text: newText, color: customColorSelected };
+            localStorage.setItem(currentEditKey, JSON.stringify(dataToSave));
+            
             currentEditDiv.textContent = newText;
+            if (customColorSelected) currentEditCell.style.backgroundColor = customColorSelected;
+            else currentEditCell.style.backgroundColor = '';
         }
         noteModal.classList.remove('active');
     });
 
-    modalCancelBtn.addEventListener('click', () => {
-        noteModal.classList.remove('active');
-    });
-
-    // Close modal if overlay is clicked
-    noteModal.addEventListener('click', (e) => {
-        if (e.target === noteModal) noteModal.classList.remove('active');
-    });
+    modalCancelBtn.addEventListener('click', () => noteModal.classList.remove('active'));
+    noteModal.addEventListener('click', (e) => { if (e.target === noteModal) noteModal.classList.remove('active'); });
 
     // Boot up
     applySettingsToUI();
