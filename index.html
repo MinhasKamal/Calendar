@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Full Screen Calendar</title>
+<title>Calendar Board</title>
 <style>
     /* CSS Variables for Theming */
     :root {
-        --bg-body: #121212;
+        --bg-body: #424242;
         --bg-title: #1f1f1f;
         --text-title: #ffffff;
         --text-main: #e0e0e0;
@@ -15,8 +15,9 @@
         --bg-header: #2c2c2c;
         --bg-cell: #1e1e1e;
         --bg-cell-hover: #2c2c2c;
-        --bg-empty: #121212;
-        --border-today: #ff9800;
+        --bg-other-month: #171717;
+        --text-other-month: #666;
+        --border-today: #1199ff;
         --text-weekend: #ffbba6;
         --menu-bg: #2d2d2d;
         --menu-border: #444;
@@ -26,7 +27,7 @@
     }
 
     body.light-theme {
-        --bg-body: #ccc;
+        --bg-body: #ddd;
         --bg-title: #2c3e50;
         --text-title: #ffffff;
         --text-main: #222222;
@@ -34,8 +35,9 @@
         --bg-header: #34495e;
         --bg-cell: #ffffff;
         --bg-cell-hover: #f1f8ff;
-        --bg-empty: #f9f9f9;
-        --border-today: #e67e22;
+        --bg-other-month: #f4f4f4;
+        --text-other-month: #999;
+        --border-today: #22e77e;
         --text-weekend: #c0392b;
         --menu-bg: #ffffff;
         --menu-border: #ddd;
@@ -45,32 +47,24 @@
     }
 
     body, html {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        font-family: sans-serif;
-        display: flex;
-        flex-direction: column;
-        background: var(--bg-body);
-        color: var(--text-main);
-        overflow: hidden; /* Prevent scrolling on body */
+        margin: 0; padding: 0; height: 100%; font-family: sans-serif;
+        display: flex; flex-direction: column; background: var(--bg-body); color: var(--text-main); overflow: hidden;
     }
 
     /* Title Bar */
     .title-bar {
         display: flex; justify-content: space-between; align-items: center;
         background: var(--bg-title); color: var(--text-title);
-        padding: 15px 20px; position: relative; flex-shrink: 0;
+        padding: 10px 10px; position: relative; flex-shrink: 0;
     }
 
     .app-name { font-size: 1.5em; font-weight: bold; }
     .nav-controls { display: flex; align-items: center; gap: 15px; }
-    .nav-controls h2 { margin: 0; font-size: 1.3em; width: 200px; text-align: center; }
+    #month-year-display { margin: 0; font-size: 1.0em; text-align: center; }
     
     .nav-btn {
         background: rgba(255,255,255,0.1); color: var(--text-title);
-        border: 1px solid rgba(255,255,255,0.2); padding: 8px 15px;
-        font-size: 1.2em; cursor: pointer; border-radius: 4px;
+        border: 1px solid rgba(255,255,255,0.2); padding: 4px 8px; font-size: 1.0em; cursor: pointer; border-radius: 4px;
     }
     .nav-btn:hover { background: rgba(255,255,255,0.2); }
 
@@ -80,10 +74,8 @@
 
     /* Settings Menu */
     .settings-menu {
-        display: none; position: absolute; top: 60px; right: 20px;
-        background: var(--menu-bg); color: var(--text-main);
-        border: 1px solid var(--menu-border); border-radius: 8px;
-        padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100; width: 250px;
+        display: none; position: absolute; top: 60px; right: 20px; background: var(--menu-bg); color: var(--text-main);
+        border: 1px solid var(--menu-border); border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100; width: 250px;
     }
     .settings-menu.active { display: block; }
     .settings-menu h3 { margin-top: 0; border-bottom: 1px solid var(--menu-border); padding-bottom: 10px; }
@@ -93,10 +85,7 @@
     .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
     .checkbox-group label { font-weight: normal; display: flex; align-items: center; gap: 5px; }
     
-    .apply-btn {
-        width: 100%; padding: 8px; background: #2980b9; color: white;
-        border: none; border-radius: 4px; cursor: pointer; font-weight: bold;
-    }
+    .apply-btn { width: 100%; padding: 8px; background: #2980b9; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
     .apply-btn:hover { background: #3498db; }
 
     /* Custom Pop-up Modal */
@@ -107,21 +96,14 @@
     .modal-overlay.active { display: flex; }
     
     .modal-content {
-        background: var(--bg-cell); width: 400px; max-width: 90%; padding: 20px;
-        border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        display: flex; flex-direction: column; gap: 15px;
+        background: var(--bg-cell); width: 400px; max-width: 90%; padding: 20px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 15px;
     }
     .modal-content h3 { margin: 0; color: var(--text-main); }
-    
     .color-picker-row { display: flex; align-items: center; gap: 10px; }
     .color-picker-row input[type="color"] { cursor: pointer; height: 30px; width: 50px; padding: 0; border: 1px solid var(--border-color); border-radius: 4px; }
-    
     .modal-content textarea {
-        width: 100%; box-sizing: border-box; background: var(--bg-body); color: var(--text-main);
-        border: 1px solid var(--border-color); padding: 10px; border-radius: 4px;
-        resize: vertical; font-family: inherit; font-size: 1em;
+        width: 100%; box-sizing: border-box; background: var(--bg-body); color: var(--text-main); border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; resize: vertical; font-family: inherit; font-size: 1em;
     }
-    
     .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
     .modal-btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
     .btn-cancel { background: #7f8c8d; color: white; }
@@ -132,107 +114,59 @@
     .btn-clear:hover { background: #c0392b; }
 
     /* Layout for Calendar + Notes Sidebar */
-    .main-layout {
-        display: flex;
-        flex: 1;
-        width: 100%;
-        overflow: hidden;
-    }
+    .main-layout { display: flex; flex: 1; width: 100%; overflow: hidden; }
+    .calendar-wrapper { display: flex; flex-direction: column; flex: 1 1 75%; min-width: 300px; }
     
-    .calendar-wrapper {
-        display: flex;
-        flex-direction: column;
-        flex: 1 1 75%; /* Default Width */
-        min-width: 300px;
-    }
+    .resizer { width: 5px; background: var(--border-color); cursor: col-resize; transition: background 0.2s; z-index: 10; }
+    .resizer:hover, .resizer.resizing { background: var(--resizer-hover); }
     
-    /* Resizer Bar */
-    .resizer {
-        width: 5px;
-        background: var(--border-color);
-        cursor: col-resize;
-        transition: background 0.2s;
-        z-index: 10;
-    }
-    .resizer:hover, .resizer.resizing {
-        background: var(--resizer-hover);
-    }
-    
-    /* Notes Sidebar */
-    .notes-wrapper {
-        flex: 0 0 25%; /* Default Width */
-        min-width: 150px;
-        display: flex;
-        flex-direction: column;
-        background: var(--bg-cell);
-        border-left: 1px solid var(--border-color);
-    }
-    
-    .notes-header {
-        background: var(--bg-header);
-        color: var(--text-title);
-        padding: 12px 15px;
-        font-weight: bold;
-        border-bottom: 1px solid var(--border-color);
-    }
-    
-    #global-notes {
-        flex: 1;
-        width: 100%;
-        box-sizing: border-box;
-        background: var(--bg-body);
-        color: var(--text-main);
-        border: none;
-        padding: 15px;
-        resize: none;
-        font-family: inherit;
-        font-size: 1em;
-    }
+    .notes-wrapper { flex: 0 0 25%; min-width: 150px; display: flex; flex-direction: column; background: var(--bg-cell); border-left: 1px solid var(--border-color); }
+    .notes-header { background: var(--bg-header); color: var(--text-title); padding: 5px 15px; font-weight: bold; border-bottom: 1px solid var(--border-color); }
+    #global-notes { flex: 1; width: 100%; box-sizing: border-box; background: var(--bg-body); color: var(--text-main); border: none; padding: 15px; resize: none; font-family: inherit; font-size: 1em; }
     #global-notes:focus { outline: none; }
 
     /* Calendar Grid */
     .header {
-        display: grid; grid-template-columns: repeat(7, 1fr);
-        background: var(--bg-header); color: var(--text-title);
-        text-align: center; font-weight: bold;
+        display: grid; grid-template-columns: repeat(7, 1fr); background: var(--bg-header); color: var(--text-title); text-align: center; font-weight: bold;
     }
-    .header div { padding: 12px 0; border-right: 1px solid var(--border-color); }
+    .header div { padding: 5px 0; border-right: 1px solid var(--border-color); }
     .header div:last-child { border-right: none; }
     
     .calendar {
-        display: grid; grid-template-columns: repeat(7, 1fr);
-        flex-grow: 1; grid-auto-rows: 1fr; background: var(--border-color); 
-        gap: 1px; overflow: hidden;
+        display: grid; grid-template-columns: repeat(7, 1fr); flex-grow: 1; grid-auto-rows: 1fr; background: var(--border-color); gap: 1px; overflow: hidden;
     }
     
     .day {
-        background: var(--bg-cell); padding: 10px; display: flex; flex-direction: column;
-        cursor: pointer; overflow-y: auto; transition: background 0.2s;
+        background: var(--bg-cell); padding: 10px; display: flex; flex-direction: column; cursor: pointer; overflow-y: auto; transition: background 0.2s;
         scrollbar-width: thin; scrollbar-color: var(--scroll-thumb) transparent;
-        /* Highlight on hover gently so they know it is clickable */
     }
     .day::-webkit-scrollbar { width: 6px; }
     .day::-webkit-scrollbar-track { background: transparent; }
     .day::-webkit-scrollbar-thumb { background-color: var(--scroll-thumb); border-radius: 10px; }
     .day:hover::-webkit-scrollbar-thumb { background-color: var(--scroll-thumb-hover); }
-    
     .day:hover { background: var(--bg-cell-hover); }
-    .day.empty { background: var(--bg-empty); cursor: default; }
+    
+    /* Out of Month Day Styling */
+    .day.other-month { background: var(--bg-other-month); }
+    .day.other-month .date-num { color: var(--text-other-month); }
+    .day.other-month .event-text { opacity: 0.7; }
     
     .day.weekend .date-num { color: var(--text-weekend); }
     .day.today { box-shadow: inset 0 0 0 3px var(--border-today); }
     
     .date-num { font-weight: bold; margin-bottom: 8px; color: var(--text-main); opacity: 0.8; pointer-events: none; }
     .event-text { font-size: 0.9em; white-space: pre-wrap; word-break: break-word; padding-bottom: 5px; color: var(--text-main); pointer-events: none;}
+
+    a { color: inherit; text-decoration: inherit; }
 </style>
 </head>
 <body>
 
 <div class="title-bar">
-    <div class="app-name">Calendar</div>
+    <div class="app-name" title="by Minhas Kamal"><a href="https://github.com/MinhasKamal/CalendarBoard" target="_blank">Calendar Board</a></div>
     <div class="nav-controls">
         <button class="nav-btn" id="prev-btn">&#9664;</button>
-        <h2 id="month-year-display">Month Year</h2>
+        <div id="month-year-display">Month Year</div>
         <button class="nav-btn" id="next-btn">&#9654;</button>
     </div>
     <div class="right-controls">
@@ -246,7 +180,7 @@
         <div class="setting-group">
             <label>Theme</label>
             <select id="theme-select">
-                <option value="dark">Dark (Default)</option>
+                <option value="dark">Dark</option>
                 <option value="light">Light</option>
             </select>
         </div>
@@ -254,7 +188,7 @@
             <label>Start Day of Week</label>
             <select id="start-day-select">
                 <option value="0">Sunday</option>
-                <option value="1">Monday (Default)</option>
+                <option value="1">Monday</option>
                 <option value="2">Tuesday</option>
                 <option value="3">Wednesday</option>
                 <option value="4">Thursday</option>
@@ -278,36 +212,27 @@
     </div>
 </div>
 
-<!-- Main Layout wrapper for Calendar and Sidebar -->
 <div class="main-layout">
-    
     <div class="calendar-wrapper" id="calendar-wrapper">
         <div class="header" id="calendar-header"></div>
         <div class="calendar" id="calendar"></div>
     </div>
-    
     <div class="resizer" id="resizer"></div>
-    
     <div class="notes-wrapper" id="notes-wrapper">
-        <div class="notes-header">Global Notes</div>
-        <textarea id="global-notes" placeholder="Keep permanent notes here..."></textarea>
+        <div class="notes-header">Notes</div>
+        <textarea id="global-notes" placeholder="Double click on dates to add notes and keep your permanent notes here..."></textarea>
     </div>
-
 </div>
 
-<!-- Multiline Note & Color Modal -->
 <div class="modal-overlay" id="note-modal">
     <div class="modal-content">
         <h3 id="modal-title">Edit Note</h3>
-        
         <div class="color-picker-row">
             <label>Day Color:</label>
             <input type="color" id="modal-color">
             <button class="modal-btn btn-clear" id="modal-clear-color" type="button">Reset Default</button>
         </div>
-
         <textarea id="modal-textarea" rows="6" placeholder="Type your multiline note here..."></textarea>
-        
         <div class="modal-actions">
             <button class="modal-btn btn-cancel" id="modal-cancel">Cancel</button>
             <button class="modal-btn btn-save" id="modal-save">Save</button>
@@ -318,13 +243,14 @@
 <script>
     // --- Configuration & State ---
     const defaultSettings = { theme: 'dark', startDay: 1, weekends: [0, 6] };
-    let settings = JSON.parse(localStorage.getItem('calendar-settings')) || defaultSettings;
+    let settings = JSON.parse(localStorage.getItem('CalendarBoard_Settings')) || defaultSettings;
 
     const actualToday = new Date();
     let displayMonth = actualToday.getMonth();
     let displayYear = actualToday.getFullYear();
 
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const shortMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
     // --- DOM Elements ---
@@ -332,7 +258,6 @@
     const headerEl = document.getElementById('calendar-header');
     const monthYearDisplay = document.getElementById('month-year-display');
     const todayDisplay = document.getElementById('today-display');
-    
     const menuBtn = document.getElementById('menu-btn');
     const settingsMenu = document.getElementById('settings-menu');
     const themeSelect = document.getElementById('theme-select');
@@ -340,13 +265,11 @@
     const applyBtn = document.getElementById('apply-btn');
     const weekendCheckboxes = document.querySelectorAll('#weekend-checkboxes input');
 
-    // Layout Resizer Elements
     const resizer = document.getElementById('resizer');
     const calendarWrapper = document.getElementById('calendar-wrapper');
     const notesWrapper = document.getElementById('notes-wrapper');
     const globalNotesArea = document.getElementById('global-notes');
 
-    // Modal Elements
     const noteModal = document.getElementById('note-modal');
     const modalTitle = document.getElementById('modal-title');
     const modalTextarea = document.getElementById('modal-textarea');
@@ -355,58 +278,37 @@
     const modalSaveBtn = document.getElementById('modal-save');
     const modalCancelBtn = document.getElementById('modal-cancel');
     
-    let currentEditKey = null;
-    let currentEditDiv = null;
-    let currentEditCell = null;
-    let customColorSelected = '';
+    let currentEditKey = null; let currentEditDiv = null; let currentEditCell = null; let customColorSelected = '';
 
     // --- Initialization ---
     const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
     todayDisplay.textContent = `${actualToday.toLocaleDateString(undefined, options)}`;
     
-    // Load saved flexbox split width (defaults to 75% calendar)
-    let savedSplit = localStorage.getItem('calendar-layout-split') || 75;
-    calendarWrapper.style.flex = `1 1 ${savedSplit}%`;
-    notesWrapper.style.flex = `0 0 ${100 - savedSplit}%`;
+    let savedSplit = localStorage.getItem('CalendarBoard_Split') || 75;
+    calendarWrapper.style.flex = `1 1 ${savedSplit}%`; notesWrapper.style.flex = `0 0 ${100 - savedSplit}%`;
     
-    // Load global notes
-    globalNotesArea.value = localStorage.getItem('global-calendar-notes') || '';
-    
-    // Auto-save global notes as user types
-    globalNotesArea.addEventListener('input', () => {
-        localStorage.setItem('global-calendar-notes', globalNotesArea.value);
-    });
+    globalNotesArea.value = localStorage.getItem('CalendarBoard_Notes') || '';
+    globalNotesArea.addEventListener('input', () => localStorage.setItem('CalendarBoard_Notes', globalNotesArea.value));
 
     function applySettingsToUI() {
-        if (settings.theme === 'light') document.body.classList.add('light-theme');
-        else document.body.classList.remove('light-theme');
-        
-        themeSelect.value = settings.theme;
-        startDaySelect.value = settings.startDay;
-        
-        weekendCheckboxes.forEach(cb => {
-            cb.checked = settings.weekends.includes(parseInt(cb.value));
-        });
+        if (settings.theme === 'light') document.body.classList.add('light-theme'); else document.body.classList.remove('light-theme');
+        themeSelect.value = settings.theme; startDaySelect.value = settings.startDay;
+        weekendCheckboxes.forEach(cb => cb.checked = settings.weekends.includes(parseInt(cb.value)));
     }
 
     function getStoredDayData(key) {
         const raw = localStorage.getItem(key);
         if (!raw) return { text: '', color: '' };
-        try {
-            const parsed = JSON.parse(raw);
-            return { text: parsed.text || '', color: parsed.color || '' };
-        } catch (e) {
-            return { text: raw, color: '' };
-        }
+        try { const parsed = JSON.parse(raw); return { text: parsed.text || '', color: parsed.color || '' }; }
+        catch (e) { return { text: raw, color: '' }; }
     }
 
-    // --- Calendar Rendering Logic ---
+    // --- Unified Grid Rendering Logic ---
     function renderCalendar(month, year) {
-        calendarEl.innerHTML = '';
-        headerEl.innerHTML = '';
-        
+        calendarEl.innerHTML = ''; headerEl.innerHTML = '';
         monthYearDisplay.textContent = `${monthNames[month]} ${year}`;
 
+        // Render Top Header
         for (let i = 0; i < 7; i++) {
             const dayIndex = (settings.startDay + i) % 7;
             const dayDiv = document.createElement('div');
@@ -414,65 +316,89 @@
             headerEl.appendChild(dayDiv);
         }
 
+        // Calculate Prev/Current/Next Month Info
+        const prevMonth = month === 0 ? 11 : month - 1;
+        const prevYear = month === 0 ? year - 1 : year;
+        const nextMonth = month === 11 ? 0 : month + 1;
+        const nextYear = month === 11 ? year + 1 : year;
+
+        const daysInPrevMonth = new Date(year, month, 0).getDate();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
         const firstDayOfMonth = new Date(year, month, 1).getDay();
         const offset = (firstDayOfMonth - settings.startDay + 7) % 7;
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        // Calculate exact total cells to complete the final week perfectly
+        const totalCells = Math.ceil((offset + daysInMonth) / 7) * 7;
 
-        for (let i = 0; i < offset; i++) {
-            const emptyCell = document.createElement('div');
-            emptyCell.classList.add('day', 'empty');
-            calendarEl.appendChild(emptyCell);
-        }
+        for (let i = 0; i < totalCells; i++) {
+            let cellDateNum, cellMonth, cellYear, isOtherMonth = false;
 
-        for (let i = 1; i <= daysInMonth; i++) {
+            if (i < offset) {
+                // Days from previous month
+                cellDateNum = daysInPrevMonth - offset + 1 + i;
+                cellMonth = prevMonth;
+                cellYear = prevYear;
+                isOtherMonth = true;
+            } else if (i >= offset + daysInMonth) {
+                // Days from next month
+                cellDateNum = i - (offset + daysInMonth) + 1;
+                cellMonth = nextMonth;
+                cellYear = nextYear;
+                isOtherMonth = true;
+            } else {
+                // Days in current month
+                cellDateNum = i - offset + 1;
+                cellMonth = month;
+                cellYear = year;
+            }
+
             const dayCell = document.createElement('div');
             dayCell.classList.add('day');
+            if (isOtherMonth) dayCell.classList.add('other-month');
             
-            const cellDate = new Date(year, month, i);
+            const cellDate = new Date(cellYear, cellMonth, cellDateNum);
             const dayOfWeek = cellDate.getDay();
 
-            if (i === actualToday.getDate() && month === actualToday.getMonth() && year === actualToday.getFullYear()) {
+            if (cellDateNum === actualToday.getDate() && cellMonth === actualToday.getMonth() && cellYear === actualToday.getFullYear()) {
                 dayCell.classList.add('today');
             }
             if (settings.weekends.includes(dayOfWeek)) {
                 dayCell.classList.add('weekend');
             }
 
-            const dateNum = document.createElement('div');
-            dateNum.classList.add('date-num');
-            dateNum.textContent = i;
-            dayCell.appendChild(dateNum);
+            // Create Date Number Label (Convert 1 into "Month 1")
+            const dateNumDiv = document.createElement('div');
+            dateNumDiv.classList.add('date-num');
+            if (cellDateNum === 1) {
+                dateNumDiv.textContent = `${shortMonthNames[cellMonth]} 1`;
+            } else {
+                dateNumDiv.textContent = cellDateNum;
+            }
+            dayCell.appendChild(dateNumDiv);
 
+            // Fetch and Attach Notes
             const eventDiv = document.createElement('div');
             eventDiv.classList.add('event-text');
-            
-            const storageKey = `calendar-note-${year}-${month}-${i}`;
+            const storageKey = `CalendarBoard_${cellYear}_${cellMonth}_${cellDateNum}`;
             const dayData = getStoredDayData(storageKey);
             
             eventDiv.textContent = dayData.text;
-            if (dayData.color) {
-                dayCell.style.backgroundColor = dayData.color;
-            }
-            
+            if (dayData.color) dayCell.style.backgroundColor = dayData.color;
             dayCell.appendChild(eventDiv);
 
-            // CHANGED: Double Click opens modal
+            // Double Click Event
             dayCell.addEventListener('dblclick', () => {
                 const currentData = getStoredDayData(storageKey);
                 currentEditKey = storageKey;
                 currentEditDiv = eventDiv;
                 currentEditCell = dayCell;
                 
-                modalTitle.textContent = `Notes for ${monthNames[month]} ${i}, ${year}`;
+                modalTitle.textContent = `Notes for ${monthNames[cellMonth]} ${cellDateNum}, ${cellYear}`;
                 modalTextarea.value = currentData.text;
                 
-                if (currentData.color) {
-                    modalColor.value = currentData.color;
-                    customColorSelected = currentData.color;
-                } else {
-                    modalColor.value = settings.theme === 'light' ? '#ffffff' : '#1e1e1e';
-                    customColorSelected = '';
-                }
+                if (currentData.color) { modalColor.value = currentData.color; customColorSelected = currentData.color; }
+                else { modalColor.value = settings.theme === 'light' ? '#ffffff' : '#1e1e1e'; customColorSelected = ''; }
 
                 noteModal.classList.add('active');
                 modalTextarea.focus();
@@ -484,83 +410,45 @@
 
     // --- Layout Drag Resizer Logic ---
     let isResizing = false;
-
-    resizer.addEventListener('mousedown', (e) => {
-        isResizing = true;
-        document.body.style.cursor = 'col-resize';
-        resizer.classList.add('resizing');
-    });
-
+    resizer.addEventListener('mousedown', () => { isResizing = true; document.body.style.cursor = 'col-resize'; resizer.classList.add('resizing'); });
     document.addEventListener('mousemove', (e) => {
         if (!isResizing) return;
-        
-        // Calculate percentages based on mouse movement across the layout container
         const containerWidth = document.querySelector('.main-layout').offsetWidth;
         const newCalendarWidthPercent = (e.clientX / containerWidth) * 100;
-        
-        // Keep constraints so panels don't disappear completely
         if (newCalendarWidthPercent > 30 && newCalendarWidthPercent < 85) {
             calendarWrapper.style.flex = `1 1 ${newCalendarWidthPercent}%`;
             notesWrapper.style.flex = `0 0 ${100 - newCalendarWidthPercent}%`;
-            savedSplit = newCalendarWidthPercent; // Remember current split
+            savedSplit = newCalendarWidthPercent;
         }
     });
-
     document.addEventListener('mouseup', () => {
         if (isResizing) {
-            isResizing = false;
-            document.body.style.cursor = ''; // Reset cursor
-            resizer.classList.remove('resizing');
-            // Save layout size to local storage
-            localStorage.setItem('calendar-layout-split', savedSplit);
+            isResizing = false; document.body.style.cursor = ''; resizer.classList.remove('resizing');
+            localStorage.setItem('CalendarBoard_Split', savedSplit);
         }
     });
 
     // --- Event Listeners ---
-    document.getElementById('prev-btn').addEventListener('click', () => {
-        displayMonth--;
-        if (displayMonth < 0) { displayMonth = 11; displayYear--; }
-        renderCalendar(displayMonth, displayYear);
-    });
-
-    document.getElementById('next-btn').addEventListener('click', () => {
-        displayMonth++;
-        if (displayMonth > 11) { displayMonth = 0; displayYear++; }
-        renderCalendar(displayMonth, displayYear);
-    });
-
-    // Menu Logic
+    document.getElementById('prev-btn').addEventListener('click', () => { displayMonth--; if (displayMonth < 0) { displayMonth = 11; displayYear--; } renderCalendar(displayMonth, displayYear); });
+    document.getElementById('next-btn').addEventListener('click', () => { displayMonth++; if (displayMonth > 11) { displayMonth = 0; displayYear++; } renderCalendar(displayMonth, displayYear); });
+    
     menuBtn.addEventListener('click', () => settingsMenu.classList.toggle('active'));
-
     applyBtn.addEventListener('click', () => {
-        const selectedWeekends = Array.from(weekendCheckboxes).filter(cb => cb.checked).map(cb => parseInt(cb.value));
-        settings = { theme: themeSelect.value, startDay: parseInt(startDaySelect.value), weekends: selectedWeekends };
-        localStorage.setItem('calendar-settings', JSON.stringify(settings));
-        settingsMenu.classList.remove('active');
-        applySettingsToUI();
-        renderCalendar(displayMonth, displayYear);
+        settings = { theme: themeSelect.value, startDay: parseInt(startDaySelect.value), weekends: Array.from(weekendCheckboxes).filter(cb => cb.checked).map(cb => parseInt(cb.value)) };
+        localStorage.setItem('CalendarBoard_Settings', JSON.stringify(settings)); settingsMenu.classList.remove('active'); applySettingsToUI(); renderCalendar(displayMonth, displayYear);
     });
-
-    document.addEventListener('click', (e) => {
-        if (!settingsMenu.contains(e.target) && e.target !== menuBtn) settingsMenu.classList.remove('active');
-    });
+    document.addEventListener('click', (e) => { if (!settingsMenu.contains(e.target) && e.target !== menuBtn) settingsMenu.classList.remove('active'); });
 
     // Modal Action Logic
     modalColor.addEventListener('input', (e) => customColorSelected = e.target.value);
-    modalClearColor.addEventListener('click', () => {
-        customColorSelected = '';
-        modalColor.value = settings.theme === 'light' ? '#ffffff' : '#1e1e1e';
-    });
+    modalClearColor.addEventListener('click', () => { customColorSelected = ''; modalColor.value = settings.theme === 'light' ? '#ffffff' : '#1e1e1e'; });
 
     modalSaveBtn.addEventListener('click', () => {
         if (currentEditKey && currentEditDiv && currentEditCell) {
             const newText = modalTextarea.value;
-            const dataToSave = { text: newText, color: customColorSelected };
-            localStorage.setItem(currentEditKey, JSON.stringify(dataToSave));
-            
+            localStorage.setItem(currentEditKey, JSON.stringify({ text: newText, color: customColorSelected }));
             currentEditDiv.textContent = newText;
-            if (customColorSelected) currentEditCell.style.backgroundColor = customColorSelected;
-            else currentEditCell.style.backgroundColor = '';
+            if (customColorSelected) currentEditCell.style.backgroundColor = customColorSelected; else currentEditCell.style.backgroundColor = '';
         }
         noteModal.classList.remove('active');
     });
@@ -569,9 +457,7 @@
     noteModal.addEventListener('click', (e) => { if (e.target === noteModal) noteModal.classList.remove('active'); });
 
     // Boot up
-    applySettingsToUI();
-    renderCalendar(displayMonth, displayYear);
-
+    applySettingsToUI(); renderCalendar(displayMonth, displayYear);
 </script>
 </body>
 </html>
